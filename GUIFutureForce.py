@@ -16,7 +16,8 @@ def printInfo(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
     print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()))
     print("GENDER: %s" %(genderChoice.get()))
     print("EDUCATION: %s" %(classification.get()))
-    print("YEAR: %s" %(yearChoice.get()))
+    if classification.get() == "UNDERGRAD":
+         print("YEAR: %s" %(yearChoice.get()))
     print("ETHNICITY: %s" %(ethnicChoice.get()))
     print("MAJOR: %s" %(majorChoice.get()))
     # print("SKILLS: %s" %(languageDropdown.get()))
