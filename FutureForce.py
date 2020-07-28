@@ -21,6 +21,8 @@ def ethnictest(string):
     return True
   else:
     return False
+
+    
 print("Hello! Please input your details below! ")
 print('\n')
 name = input("What is your name? ")
