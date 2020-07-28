@@ -12,11 +12,21 @@ def getYear():
     yearDropdown = OptionMenu(window, yearChoice, "Freshman", "Sophomore", "Junior", "Senior")
     yearDropdown.place(x=175, y=185)
 
+def printInfo(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
+    print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()))
+    print("GENDER: %s" %(genderChoice.get()))
+    print("EDUCATION: %s" %(classification.get()))
+    print("YEAR: %s" %(yearChoice.get()))
+    print("ETHNICITY: %s" %(ethnicChoice.get()))
+    print("MAJOR: %s" %(majorChoice.get()))
+    # print("SKILLS: %s" %(languageDropdown.get()))
+    
 window=Tk()
 
 #FIRST NAME
 firstLabel = Label(window, text="First name: ", font='Helvetica 13 italic')
 firstLabel.place(x=25, y=17)
+firstName = StringVar(window)
 firstName = Entry(window, width=15)
 firstName.place(x=105, y=10)
 
@@ -65,7 +75,6 @@ ethnicityDropdown.place(x=175, y=210)
 majorLabel = Label(window, text="What is your major?", font="Helvetica 13 italic")
 majorLabel.place(x=25, y=235)
 majorChoice = StringVar()
-majorChoice.set("Computer Science")
 majorDropdown = OptionMenu(window, majorChoice, 
                             "Agriculture",
                             "Architecture",
@@ -140,6 +149,9 @@ languageList = ["C",
 for each_item in range(len(languageList)):
     languageDropdown.insert(END, languageList[each_item])
 
+
+giveInfo = Button(window, text="Search", bg="blue", command = printInfo)
+giveInfo.place(x=25, y=500)
 
 
 window.title('QUESTIONNAIRE')
