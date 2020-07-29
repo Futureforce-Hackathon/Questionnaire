@@ -1,5 +1,8 @@
 from tkinter import *
+import tkinter.ttk as ttk
+import csv
 from tkinter.ttk import Combobox
+
 
 ###########################################################################################
     #TO CLARIFY, THE INFORMATION GIVEN BY THE USER: 
@@ -50,46 +53,108 @@ def printInfo(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
     # SKILLS (list) - skillsList[]
     
 window = Tk()
+window.title('QUESTIONNAIRE')
 
-#COLORS
-headerColor = "#e63946"
-headerTextColor = "#ffffff"
-bodyColor = "#ddeef8"
-bodyTextColor = "#112a38"
-skillsColor = "#abc5f5"
-skillsTextColor = "#0d1717"
+#DISPLAY CSV 
+width = 1300
+height = 700
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight() 
+x = (screen_width / 2) - (width / 2)
+y = (screen_height / 2) - (height / 2) 
+window.geometry("%dx%d+%d+%d" %(width, height, x, y)) 
 
-#STYLING
-headerCanvas = Canvas(window, width=800, height=50, bg=headerColor, highlightbackground=headerColor)
-headerCanvas.grid()
+TableMargin = Frame(window, width=1000)
+TableMargin.pack(side=RIGHT)
+scrollbarx = Scrollbar(TableMargin, orient=HORIZONTAL)
+scrollbary = Scrollbar(TableMargin, orient=VERTICAL)
+tree = ttk.Treeview(TableMargin, columns=("Company", "Program", "Demographic", "Year in College", "Role", "Majors", 'Programming Languages/Software'), height=400, selectmode="extended", yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+
+
+#COLORS FOR LEFT SIDE
+headerColor = "#f1faee"
+headerTextColor = "black"
+bodyColor = "#a8dadc"
+bodyTextColor = "black"
+skillsColor = "#457b9d"
+skillsTextColor = "white"
+
+#STYLING FOR LEFT SIDE
+headerCanvas = Canvas(TableMargin, width=490, height=50, bg=headerColor, highlightbackground=headerColor)
+headerCanvas.pack(side=LEFT)
+headerCanvas.place(x=0)
 headerCanvas.tag_lower(headerCanvas)
 
-bodyCanvas = Canvas(window, width=800, height=210, bg=bodyColor, highlightbackground=bodyColor)
-bodyCanvas.grid()
+bodyCanvas = Canvas(TableMargin, width=490, height=600, bg=bodyColor, highlightbackground=bodyColor)
+bodyCanvas.pack(side=LEFT)
+bodyCanvas.place(x=0,y=50)
 bodyCanvas.tag_lower(headerCanvas)
 
-skillsCanvas = Canvas(window, width=800, height=500, bg=skillsColor, highlightbackground=skillsColor)
-skillsCanvas.grid()
-skillsCanvas.tag_lower(headerCanvas)
+skillsCanvas = Canvas(TableMargin, width=490, height=500, bg=skillsColor, highlightbackground=skillsColor)
+skillsCanvas.pack(side=LEFT)
+skillsCanvas.place(x=0, y=280)
+skillsCanvas.tag_lower(bodyCanvas)
+
+borderCanvas = Canvas(TableMargin, width=2, height=1000, bg="#1d3557", highlightbackground="#1d3557")
+borderCanvas.pack(side=LEFT)
+borderCanvas.place(x=490, y=0)
+borderCanvas.tag_raise(headerCanvas)
+
+#SCROLLING FOR CVS FILE
+scrollbary.config(command=tree.yview)
+scrollbary.pack(side=RIGHT, fill=Y)
+scrollbarx.config(command=tree.xview)
+scrollbarx.pack(side=BOTTOM, fill=X)
+tree.heading('Company', text="Company", anchor=W)
+tree.heading('Program', text="Program", anchor=W)
+tree.heading('Demographic', text="Demographic", anchor=W)
+tree.heading('Year in College', text="Year in College", anchor=W)
+tree.heading('Role', text="Role", anchor=W)
+tree.heading('Majors', text="Majors", anchor=W)
+tree.heading('Programming Languages/Software', text="Programming Languages/Software", anchor=W)
+tree.column('#0', stretch=YES, minwidth=510, width=500)
+tree.column('#1', stretch=YES, minwidth=175, width=175)
+tree.column('#2', stretch=YES, minwidth=285, width=285)
+tree.column('#3', stretch=YES, minwidth=255, width=255)
+tree.column('#4', stretch=YES, minwidth=120, width=120)
+tree.column('#5', stretch=YES, minwidth=200, width=200)
+tree.column('#6', stretch=YES, minwidth=700, width=700)
+tree.column('#7', stretch=YES, minwidth=400, width=400)
+
+tree.pack()
+
+#OPENING CVS FILE
+with open('./Diversity Tech Programs Spreadsheet - Sheet1.csv') as f:
+    reader = csv.DictReader(f, delimiter=',')
+    for row in reader:
+        company = row['Company']
+        program = row['Program']
+        demographic = row['Demographic']
+        yearIn = row['Year in College']
+        role = row['Role']
+        majors = row['Majors']
+        skills = row['Programming Languages/Software']
+        tree.insert("", 0, values=(company, program, demographic, yearIn, role, majors, skills))
+
 
 #FIRST NAME
 firstLabel = Label(window, text="First name: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
 firstLabel.place(x=25, y=17)
 firstName = StringVar(window)
-firstName = Entry(window, width=15, borderwidth=0, highlightthickness=0.5, highlightcolor="#b8b8b8")
+firstName = Entry(window, width=10, borderwidth=0.5, highlightthickness=0.5, highlightcolor="#b8b8b8", bg="#E5F6DF")
 firstName.place(x=105, y=16)
 
 #MIDDLE INITIAL
 middleLabel = Label(window, text="MI: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
-middleLabel.place(x=235, y=17)
-middleInitial = Entry(window, width=2, borderwidth=0, highlightthickness=0.5, highlightcolor="#b8b8b8")
-middleInitial.place(x=265, y=16)
+middleLabel.place(x=200, y=17)
+middleInitial = Entry(window, width=2, borderwidth=0.5, highlightthickness=0.5, highlightcolor="#b8b8b8", bg="#E5F6DF")
+middleInitial.place(x=230, y=16)
 
 #LAST NAME
 lastLabel = Label(window, text="Last name: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
-lastLabel.place(x=300, y=17)
-lastName = Entry(window, borderwidth=0, highlightthickness=0.5, highlightcolor="#b8b8b8")
-lastName.place(x=380, y=16)
+lastLabel.place(x=260, y=17)
+lastName = Entry(window, width=10, borderwidth=0.5, highlightthickness=0.5, highlightcolor="#b8b8b8", bg="#E5F6DF")
+lastName.place(x=340, y=16)
 
 #GENDER
 chooseGenderLabel = Label(window, text="Please choose your current preferred gender: ", font='Helvetica 13 italic', bg=bodyColor, fg=bodyTextColor)
@@ -109,13 +174,13 @@ highschool.config(bg=bodyColor, fg=bodyTextColor)
 highschool.place(x=25, y=150)
 undergraduate = Radiobutton(window, text="Undergraduate", variable=classification, value="UNDERGRAD", command=getYear)
 undergraduate.config(bg=bodyColor, fg=bodyTextColor)
-undergraduate.place(x=150, y=150)
+undergraduate.place(x=130, y=150)
 graduate = Radiobutton(window, text="Graduate", variable=classification, value="GRAD")
 graduate.config(bg=bodyColor, fg=bodyTextColor)
-graduate.place(x=290, y=150)
+graduate.place(x=255, y=150)
 otherEducation = Radiobutton(window, text="Other", variable=classification, value="OTHER")
 otherEducation.config(bg=bodyColor, fg=bodyTextColor)
-otherEducation.place(x=420, y=150)
+otherEducation.place(x=345, y=150)
 
 #ETHNICITY 
 ethnicityLabel = Label(window, text="What is your ethnicity?", font="Helvetica 13 italic", bg=bodyColor, fg=bodyTextColor)
@@ -212,7 +277,6 @@ giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13"
 giveInfo.place(x=25, y=500)
 
 
-window.title('QUESTIONNAIRE')
-window.geometry("600x600+10+10")
-window.resizable(0,0)
+# window.geometry("1300x600+10+10")
+# window.resizable(True, True)
 window.mainloop()
