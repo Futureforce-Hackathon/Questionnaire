@@ -69,10 +69,13 @@ def printInfoNew(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
 # Function that will first filter the CSV file using the user inputs and then display them. 
 ############################################################################################
 def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educationNew, yearNew, ethnicityNew, majorNew, skillsNew):
+    global TableMargin
     TableMargin = Frame(window, width=1000)
     TableMargin.pack(side=RIGHT)
+
     scrollbarx = Scrollbar(TableMargin, orient=HORIZONTAL)
     scrollbary = Scrollbar(TableMargin, orient=VERTICAL)
+    global tree
     tree = ttk.Treeview(TableMargin, columns=("Company", "Program", "Demographic", "Year in College", "Role", "Majors", 'Programming Languages/Software'), height=400, selectmode="extended", yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
 
     #COLORS FOR LEFT SIDE
@@ -127,9 +130,14 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     tree.pack()
     
     #OPENING CVS FILE
+    refreshCounts = 0
+    filteredPrograms = "filteredPrograms.csv" # separate file that will be shown when filtered
     with open('./Diversity Tech Programs Spreadsheet - Sheet1.csv') as f:
         reader = csv.DictReader(f, delimiter=',')
+        refreshCounts = refreshCounts + 1
+        rowID = 1
         for row in reader:
+            rowID = rowID  + 1
             company = row['Company']
             program = row['Program']
             demographic = row['Demographic']
@@ -137,7 +145,17 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
             role = row['Role']
             majors = row['Majors']
             skills = row['Programming Languages/Software']
-            tree.insert("", 0, values=(company, program, demographic, yearIn, role, majors, skills))
+            
+            if str(ethnicityNew) in str(demographic):
+                print("\nETHNICITY + DEMOGRAPHIC == ", ethnicityNew, demographic)
+                tree.insert("", 0, values=(company, program, demographic, yearIn, role, majors, skills))
+
+            ##########################################
+            #    FILTERING ALGORITHM WILL GO HERE    #
+            ##########################################
+
+
+    print("4444444444444444444444444444444444444444444444444444444444444\n")
 
     #FIRST NAME
     firstLabel = Label(window, text="First name: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
@@ -204,7 +222,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     global ethnicChoiceB
     ethnicChoiceB = StringVar()
     ethnicChoiceB.set(ethnicityNew)
-    ethnicityDropdown = OptionMenu(window, ethnicChoiceB, "American Indian/Alaska Native", "Asian", "Black/African American", "Hispanic/LatinX", "Native Hawaiian/Other Pacific Islander", "White")
+    ethnicityDropdown = OptionMenu(window, ethnicChoiceB, "American Indian/Alaska Native", "Asian", "African American", "Black", "Indian", "Latino", "Native Hawaiian/Other Pacific Islander", "White")
     ethnicityDropdown.config(bg=bodyColor, fg=bodyTextColor)
     ethnicityDropdown.place(x=175, y=210)
 
@@ -249,6 +267,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
                                 "Psychology",
                                 "Science Technologies/Technicians",
                                 "Social Sciences",
+                                "Software Engineering",
                                 "Theology, Religious Vocations",
                                 "Transportation/ Materials Moving",
                                 "Visual and Performing Arts",
@@ -320,23 +339,23 @@ def getYear():
 # This function then calls the filterPrograms() function.
 ############################################################################################
 def printInfo(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
-    print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()))
-    print("GENDER: %s" %(genderChoice.get()))
-    print("EDUCATION: %s" %(classification.get()))
+    print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()), "TYPES: ", type(firstName.get()), type(middleInitial.get()), type(lastName.get()))
+    print("GENDER: %s" %(genderChoice.get()), type(genderChoice.get()))
+    print("EDUCATION: %s" %(classification.get()), type(classification.get()))
 
     year = "ANY"
     if classification.get() == "UNDERGRAD":
-         print("YEAR: %s" %(yearChoice.get()))
+         print("YEAR: %s" %(yearChoice.get()), type(yearChoice.get()))
          year = yearChoice.get()
-    print("ETHNICITY: %s" %(ethnicChoice.get()))
-    print("MAJOR: %s" %(majorChoice.get()))
+    print("ETHNICITY: %s" %(ethnicChoice.get()), type(ethnicChoice.get()))
+    print("MAJOR: %s" %(majorChoice.get()), type(majorChoice.get()))
     skillsIndeces = list(map(int, languageDropdown.curselection()))
     skillsList = []
     for i in range(len(skillsIndeces)):
         skillIndex = skillsIndeces[i]
         skillsList.append(languageList[skillIndex])
 
-    print("SKILLS: ", skillsList)   
+    print("SKILLS: ", skillsList, type(skillsList))   
 
     filterPrograms(firstName.get(), middleInitial.get(), lastName.get(), genderChoice.get(), classification.get(), year, ethnicChoice.get(), majorChoice.get(), skillsList)
 
@@ -506,7 +525,7 @@ def main():
     global ethnicChoice
     ethnicChoice = StringVar()
     ethnicChoice.set("American Indian/Alaska Native")
-    ethnicityDropdown = OptionMenu(window, ethnicChoice, "American Indian/Alaska Native", "Asian", "Black/African American", "Hispanic/LatinX", "Native Hawaiian/Other Pacific Islander", "White")
+    ethnicityDropdown = OptionMenu(window, ethnicChoice, "American Indian/Alaska Native", "Asian", "African American", "Black", "Indian", "Latino", "Native Hawaiian/Other Pacific Islander", "White")
     ethnicityDropdown.config(bg=bodyColor, fg=bodyTextColor)
     ethnicityDropdown.place(x=175, y=210)
 
@@ -551,6 +570,7 @@ def main():
                                 "Psychology",
                                 "Science Technologies/Technicians",
                                 "Social Sciences",
+                                "Software Engineering",
                                 "Theology, Religious Vocations",
                                 "Transportation/ Materials Moving",
                                 "Visual and Performing Arts",
