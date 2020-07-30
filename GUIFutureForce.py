@@ -370,7 +370,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
 
 
     # giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13", text="Refresh", command = printInfoNew)
-    giveInfo.place(x=25, y=500)
+    # giveInfo.place(x=25, y=500)
 
 
 
