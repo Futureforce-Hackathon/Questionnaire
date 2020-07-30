@@ -2,6 +2,9 @@ from tkinter import *
 import tkinter.ttk as ttk
 import csv
 from tkinter.ttk import Combobox
+import sys
+import os
+
 
 
 #########################################################
@@ -34,6 +37,10 @@ def getYearNew():
     yearDropdown.place(x=175, y=185)
 
 
+
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
 
 
 ############################################################################################
@@ -215,6 +222,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
         
         for z in range(len(FinalListOfList)):
             valuesNow = FinalListOfList[len(FinalListOfList)-z-1]
+            # print("\nROW VALUE: ", RowValue[len(FinalListOfList)-z-1])
             tree.insert("", 0, values=(valuesNow))
 
 
@@ -369,8 +377,8 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
         languageDropdown.insert(END, languageList[each_item])
 
 
-    # giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13", text="Refresh", command = printInfoNew)
-    # giveInfo.place(x=25, y=500)
+    giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13", text="Restart", command = restart_program)
+    giveInfo.place(x=25, y=500)
 
 
 
