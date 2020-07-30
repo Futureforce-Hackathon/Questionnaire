@@ -131,7 +131,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     
     #OPENING CVS FILE
     # filteredPrograms = "filteredPrograms.csv" # separate file that will be shown when filtered
-    with open('./TestSpreadsheet.csv') as f:
+    with open('./Diversity Tech Programs Spreadsheet - Sheet1.csv') as f:
         reader = csv.DictReader(f, delimiter=',')
         rowID = 0 # MAYBE CHANGE TO 1 LATER ????
 
@@ -369,7 +369,7 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
         languageDropdown.insert(END, languageList[each_item])
 
 
-    giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13", text="Refresh", command = printInfoNew)
+    # giveInfo = Button(window, highlightbackground = skillsColor, font="Helvetica 13", text="Refresh", command = printInfoNew)
     giveInfo.place(x=25, y=500)
 
 
