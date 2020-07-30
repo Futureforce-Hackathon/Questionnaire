@@ -41,23 +41,23 @@ def getYearNew():
 # Function that updates users info when they click Refresh
 ############################################################################################
 def printInfoNew(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
-    print("\nNAME: %s %s %s " %(firstNameB.get(), middleInitialB.get(), lastNameB.get()))
-    print("GENDER: %s" %(genderChoiceB.get()))
-    print("EDUCATION: %s" %(classificationB.get()))
+    # print("\nNAME: %s %s %s " %(firstNameB.get(), middleInitialB.get(), lastNameB.get()))
+    # print("GENDER: %s" %(genderChoiceB.get()))
+    # print("EDUCATION: %s" %(classificationB.get()))
 
     yearB = "ANY"
     if classificationB.get() == "UNDERGRAD":
-         print("YEAR: %s" %(yearChoiceB.get()))
+        #  print("YEAR: %s" %(yearChoiceB.get()))
          yearB = yearChoiceB.get()
-    print("ETHNICITY: %s" %(ethnicChoiceB.get()))
-    print("MAJOR: %s" %(majorChoiceB.get()))
+    # print("ETHNICITY: %s" %(ethnicChoiceB.get()))
+    # print("MAJOR: %s" %(majorChoiceB.get()))
     skillsIndeces = list(map(int, languageDropdown.curselection()))
     skillsList = []
     for i in range(len(skillsIndeces)):
         skillIndex = skillsIndeces[i]
         skillsList.append(languageList[skillIndex])
 
-    print("SKILLS: ", skillsList)   
+    # print("SKILLS: ", skillsList)   
 
     filterPrograms(firstNameB.get(), middleInitialB.get(), lastNameB.get(), genderChoiceB.get(), classificationB.get(), yearB, ethnicChoiceB.get(), majorChoiceB.get(), skillsList)
 
@@ -130,13 +130,20 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     tree.pack()
     
     #OPENING CVS FILE
-    refreshCounts = 0
-    filteredPrograms = "filteredPrograms.csv" # separate file that will be shown when filtered
-    with open('./Diversity Tech Programs Spreadsheet - Sheet1.csv') as f:
+    # filteredPrograms = "filteredPrograms.csv" # separate file that will be shown when filtered
+    with open('./TestSpreadsheet.csv') as f:
         reader = csv.DictReader(f, delimiter=',')
-        refreshCounts = refreshCounts + 1
-        rowID = 1
+        rowID = 0 # MAYBE CHANGE TO 1 LATER ????
+
+        RowValue = []
+        indexValues = []
+        ignoredIndexes = []
+        maxIndex = 0
+
+        ListOfList = []
+        FinalListOfList = []
         for row in reader:
+            RowList = []
             rowID = rowID  + 1
             company = row['Company']
             program = row['Program']
@@ -145,17 +152,71 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
             role = row['Role']
             majors = row['Majors']
             skills = row['Programming Languages/Software']
-            
-            if str(ethnicityNew) in str(demographic):
-                print("\nETHNICITY + DEMOGRAPHIC == ", ethnicityNew, demographic)
-                tree.insert("", 0, values=(company, program, demographic, yearIn, role, majors, skills))
 
-            ##########################################
-            #    FILTERING ALGORITHM WILL GO HERE    #
-            ##########################################
+            demographicValue = 0
+            yearValue = 0
+            roleValue = 0
+            majorValue = 0
+            skillsValue = 0
 
+            # MAP str(yearNew) TO INT VALUE
+            yearList = ["Freshman", "Sophomore", "Junior", "Senior"]
+            if str(yearNew) in yearList: # IF THE USER CHOSE A YEAR, GET THE INT EQUIVALENT
+                yearNewINT = yearList.index(yearNew) + 1 #JUNIOR will be 3
 
-    print("4444444444444444444444444444444444444444444444444444444444444\n")
+            # IF PROGRAM DEMOGRAPHIC CONTAINS USER ETHNICITY, ADD 3pts [MORE IMPORTANT]          
+            if str(ethnicityNew) in str(demographic): 
+                demographicValue = demographicValue + 3
+
+            # IF THE USER CHOSE A YEAR, SEE IF THEY GET POINTS
+            if str(yearNew) in yearList: 
+                if str(yearIn) == "Any": # IF PROGRAM DOESN'T CARE ABOUT YEAR, ADD 1pt
+                    yearValue = yearValue + 1
+                else: # ELSE, SEE IF THE YEAR MATCHES TO WHAT THEY WANT.
+                    if str(yearNewINT) in str(yearIn): 
+                        yearValue = yearValue + 1 # IF IT DOES MATCH, ADD 1pt
+
+            # IF THE PROGRAM ROLE CONTAINS USER MAJOR, ADD 1pt
+            if str(majorNew) in str(role):
+                roleValue = roleValue + 1
+
+            # IF THE PROGRAM MAOJR CONTAINS USER MAJOR, ADD 2pts [MORE IMPORTANT]
+            if str(majorNew) in str(majors):
+                majorValue = majorValue + 2
+
+            # IF PROGRAM SKILLS CONTAIN USER SKILLS, ADD 1pt PER SKILL
+            for skillIndex in range(len(skillsNew)):
+                if str(skillsNew[skillIndex]) in str(skills): 
+                    skillsValue = skillsValue + 1
+
+            # IF PROGRAM DEMOGRAPHIC CONTAINS USERS GENDER, ADD 3pts [MORE IMPORTANT]
+            if str(genderNew) in str(demographic):
+                demographicValue = demographicValue + 3
+
+            # ADD UP THE VALUES TO SEE HOW IMPORTANT THIS ROW IS 
+            totalRowValue = demographicValue + yearValue + roleValue + majorValue + skillsValue 
+            RowValue.append(totalRowValue)
+            RowList = [company, program, demographic, yearIn, role, majors, skills]
+            ListOfList.append(RowList)
+            # print("ROW VALUE: ", totalRowValue)
+
+        for t in range(len(RowValue)):
+            currentMax = 0
+            for i in range(len(RowValue)):
+                if i not in ignoredIndexes:
+                    if RowValue[i] >= currentMax:
+                        currentMax = RowValue[i]
+                        maxIndex = i
+            ignoredIndexes.append(maxIndex)
+            indexValues.append(maxIndex)
+        
+        for y in range(len(indexValues)):
+            FinalListOfList.append(ListOfList[indexValues[y]])
+        
+        for z in range(len(FinalListOfList)):
+            valuesNow = FinalListOfList[len(FinalListOfList)-z-1]
+            tree.insert("", 0, values=(valuesNow))
+
 
     #FIRST NAME
     firstLabel = Label(window, text="First name: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
@@ -164,10 +225,6 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     firstNameBLabel = Label(window, text=firstNameNew, font='Helvetica 13 bold', bg=headerColor, fg=headerTextColor)
     firstLabel.place(x=15, y=17)
     firstNameBLabel.place(x=105,y=16)
-    # global firstNameB
-    # firstNameB = StringVar()
-    # firstNameB = Entry(window, width=10, borderwidth=0.5, highlightthickness=0.5, highlightcolor="#b8b8b8", bg="#E5F6DF")
-    # firstNameB.place(x=105, y=16)
 
     #MIDDLE INITIAL
     middleLabel = Label(window, text="MI: ", font='Helvetica 13 italic', bg=headerColor, fg=headerTextColor)
@@ -316,6 +373,8 @@ def filterPrograms(firstNameNew, middleInitialNew, lastNameNew, genderNew, educa
     giveInfo.place(x=25, y=500)
 
 
+
+
 ############################################################################################
 # getYear()
 # Function that displays the "Undergraduate year?" label and entry box for undergraduates.
@@ -339,23 +398,23 @@ def getYear():
 # This function then calls the filterPrograms() function.
 ############################################################################################
 def printInfo(): #FOR TESTING PURPOSES, THIS WILL DISPLAY THE INFO SO FAR
-    print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()), "TYPES: ", type(firstName.get()), type(middleInitial.get()), type(lastName.get()))
-    print("GENDER: %s" %(genderChoice.get()), type(genderChoice.get()))
-    print("EDUCATION: %s" %(classification.get()), type(classification.get()))
+    # print("\nNAME: %s %s %s " %(firstName.get(), middleInitial.get(), lastName.get()), "TYPES: ", type(firstName.get()), type(middleInitial.get()), type(lastName.get()))
+    # print("GENDER: %s" %(genderChoice.get()), type(genderChoice.get()))
+    # print("EDUCATION: %s" %(classification.get()), type(classification.get()))
 
     year = "ANY"
     if classification.get() == "UNDERGRAD":
-         print("YEAR: %s" %(yearChoice.get()), type(yearChoice.get()))
+        #  print("YEAR: %s" %(yearChoice.get()), type(yearChoice.get()))
          year = yearChoice.get()
-    print("ETHNICITY: %s" %(ethnicChoice.get()), type(ethnicChoice.get()))
-    print("MAJOR: %s" %(majorChoice.get()), type(majorChoice.get()))
+    # print("ETHNICITY: %s" %(ethnicChoice.get()), type(ethnicChoice.get()))
+    # print("MAJOR: %s" %(majorChoice.get()), type(majorChoice.get()))
     skillsIndeces = list(map(int, languageDropdown.curselection()))
     skillsList = []
     for i in range(len(skillsIndeces)):
         skillIndex = skillsIndeces[i]
         skillsList.append(languageList[skillIndex])
 
-    print("SKILLS: ", skillsList, type(skillsList))   
+    # print("SKILLS: ", skillsList, type(skillsList))   
 
     filterPrograms(firstName.get(), middleInitial.get(), lastName.get(), genderChoice.get(), classification.get(), year, ethnicChoice.get(), majorChoice.get(), skillsList)
 
@@ -387,13 +446,6 @@ def main():
     x = (screen_width / 2) - (width / 2)
     y = (screen_height / 2) - (height / 2) 
     window.geometry("%dx%d+%d+%d" %(width, height, x, y)) 
-
-    # TableMargin = Frame(window, width=10)
-    # TableMargin.pack(side=LEFT)
-    # scrollbarx = Scrollbar(TableMargin, orient=HORIZONTAL)
-    # scrollbary = Scrollbar(TableMargin, orient=VERTICAL)
-    # tree = ttk.Treeview(TableMargin, columns=("Company", "Program", "Demographic", "Year in College", "Role", "Majors", 'Programming Languages/Software'), height=400, selectmode="extended", yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
-
 
     #COLORS FOR LEFT SIDE
     global headerColor
@@ -430,41 +482,7 @@ def main():
     borderCanvas.place(x=490, y=0)
     borderCanvas.tag_raise(headerCanvas)
 
-    # SCROLLING FOR RIGHT SIDE
-    # scrollbary.config(command=tree.yview)
-    # scrollbary.pack(side=RIGHT, fill=Y)
-    # scrollbarx.config(command=tree.xview)
-    # scrollbarx.pack(side=BOTTOM, fill=X)
-    # tree.heading('Company', text="Company", anchor=W)
-    # tree.heading('Program', text="Program", anchor=W)
-    # tree.heading('Demographic', text="Demographic", anchor=W)
-    # tree.heading('Year in College', text="Year in College", anchor=W)
-    # tree.heading('Role', text="Role", anchor=W)
-    # tree.heading('Majors', text="Majors", anchor=W)
-    # tree.heading('Programming Languages/Software', text="Programming Languages/Software", anchor=W)
-    # tree.column('#0', stretch=YES, minwidth=510, width=500)
-    # tree.column('#1', stretch=YES, minwidth=175, width=175)
-    # tree.column('#2', stretch=YES, minwidth=285, width=285)
-    # tree.column('#3', stretch=YES, minwidth=255, width=255)
-    # tree.column('#4', stretch=YES, minwidth=120, width=120)
-    # tree.column('#5', stretch=YES, minwidth=200, width=200)
-    # tree.column('#6', stretch=YES, minwidth=700, width=700)
-    # tree.column('#7', stretch=YES, minwidth=400, width=400)
 
-    # tree.pack()
-
-    #OPENING CVS FILE
-    # with open('./Diversity Tech Programs Spreadsheet - Sheet1.csv') as f:
-    #     reader = csv.DictReader(f, delimiter=',')
-    #     for row in reader:
-    #         company = row['Company']
-    #         program = row['Program']
-    #         demographic = row['Demographic']
-    #         yearIn = row['Year in College']
-    #         role = row['Role']
-    #         majors = row['Majors']
-    #         skills = row['Programming Languages/Software']
-    #         tree.insert("", 0, values=(company, program, demographic, yearIn, role, majors, skills))
 
 
     #FIRST NAME
